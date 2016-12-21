@@ -14,5 +14,5 @@ func (this *BaseController) SetTheme(theme string) {
 }
 
 func (this *BaseController) Display(file string) {
-	this.TplName = "default/" + file + ".html"
+	this.TplName =  file + ".html"
 }
