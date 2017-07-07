@@ -1,4 +1,4 @@
-package core
+package beecmf
 
 import (
 	"github.com/astaxie/beego"

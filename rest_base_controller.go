@@ -1,4 +1,4 @@
-package core
+package beecmf
 
 import (
 	"fmt"
@@ -135,13 +135,13 @@ func (this *RestBaseController) setDevHeader() {
 
 func (this *RestBaseController) UserId() int64 {
 
-	userId := 0
+	var userId int64 = 0
 	sessionUserId := this.GetSession("UserId")
 
 	fmt.Println(sessionUserId)
 
 	switch v := sessionUserId.(type) {
-	case int:
+	case int64:
 		userId = int64(v)
 	}
 
