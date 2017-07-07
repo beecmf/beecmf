@@ -1,4 +1,4 @@
-package beecmf
+package core
 
 import (
 	"reflect"
@@ -6,6 +6,12 @@ import (
 	"fmt"
 	"strings"
 )
+
+var routes map[string]beego.ControllerInterface
+
+func init()  {
+	routes = make(map[string]beego.ControllerInterface)
+}
 
 func AutoRouter(c beego.ControllerInterface) {
 	reflectVal := reflect.ValueOf(c)
@@ -20,8 +26,12 @@ func AutoRouter(c beego.ControllerInterface) {
 	app:=strings.Replace(pkgPath,apps,"",-1);
 	app= strings.Replace(app,"/controllers","",-1);
 
-	fmt.Println(app)
 
+
+	routes[app+"/"+t.Name()] = c
+
+
+	fmt.Println(routes)
 
 }
 

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"github.com/beecmf/beecmf"
+	"seashell/core"
 )
 
 type IndexController struct {
-	beecmf.BaseController
+	core.BaseController
 }
 
 func (c *IndexController) Index() {

@@ -1,6 +1,7 @@
-package beecmf
+package core
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -8,6 +9,14 @@ type RestBaseController struct {
 	beego.Controller
 }
 
+func (this *RestBaseController)Prepare() {
+	fmt.Println("prepare")
+
+	if (this.UserId() == 0) {
+		this.Error("没有登录")
+	}
+
+}
 // 成功返回, 用法
 // Sucsess("成功信息")
 // Success("成功信息","跳转链接")
@@ -15,6 +24,7 @@ type RestBaseController struct {
 // Success("成功信息",返回数据struct,"跳转链接")
 func (this *RestBaseController) Success(message string, data ...interface{}) {
 
+	fmt.Println("success")
 	var (
 		url string
 		mData interface{}
@@ -32,11 +42,11 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 		}
 	}
 
-	if (dataLength ==1) {
+	if (dataLength == 1) {
 		if v, ok := data[0].(string); ok {
 			url = v
-		}else{
-			mData= data[0]
+		} else {
+			mData = data[0]
 		}
 
 	}
@@ -55,9 +65,7 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 
 	this.Data["json"] = result
 
-	if (beego.BConfig.RunMode == beego.DEV) {
-		this.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
-	}
+	this.setDevHeader()
 
 	this.ServeJSON()
 
@@ -88,11 +96,11 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 		}
 	}
 
-	if (dataLength ==1) {
+	if (dataLength == 1) {
 		if v, ok := data[0].(string); ok {
 			url = v
-		}else{
-			mData= data[0]
+		} else {
+			mData = data[0]
 		}
 
 	}
@@ -111,10 +119,31 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 
 	this.Data["json"] = result
 
-	if (beego.BConfig.RunMode == beego.DEV) {
-		this.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
-	}
+	this.setDevHeader()
 
 	this.ServeJSON()
 
+}
+
+func (this *RestBaseController) setDevHeader() {
+	if (beego.BConfig.RunMode == beego.DEV) {
+		//this.Ctx.Output.Header("P3P", "CP=CAO PSA OUR")
+		this.Ctx.Output.Header("Access-Control-Allow-Credentials", "true")
+		this.Ctx.Output.Header("Access-Control-Allow-Origin", "http://127.0.0.1:8010")
+	}
+}
+
+func (this *RestBaseController) UserId() int64 {
+
+	userId := 0
+	sessionUserId := this.GetSession("UserId")
+
+	fmt.Println(sessionUserId)
+
+	switch v := sessionUserId.(type) {
+	case int:
+		userId = int64(v)
+	}
+
+	return userId
 }

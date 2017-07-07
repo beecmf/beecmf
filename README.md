@@ -1,2 +1,2 @@
-# beecmf
-beecmf is a content manage framework of beego!
+# core
+core is a content manage framework of beego!
