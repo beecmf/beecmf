@@ -3,20 +3,27 @@ package beecmf
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/beecmf/beecmf/models"
 )
 
 type RestBaseController struct {
 	beego.Controller
+	currentUser *models.User
 }
 
-func (this *RestBaseController)Prepare() {
+func (this *RestBaseController) Prepare() {
 	fmt.Println("prepare")
 
-	if (this.UserId() == 0) {
+	user := this.CurrentUser()
+
+	fmt.Println(user)
+
+	if user == nil {
 		this.Error("没有登录")
 	}
 
 }
+
 // 成功返回, 用法
 // Sucsess("成功信息")
 // Success("成功信息","跳转链接")
@@ -26,14 +33,14 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 
 	fmt.Println("success")
 	var (
-		url string
-		mData interface{}
+		url        string
+		mData      interface{}
 		dataLength int
 	)
 
 	dataLength = len(data)
 
-	if (dataLength > 1) {
+	if dataLength > 1 {
 
 		mData = data[0]
 
@@ -42,7 +49,7 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 		}
 	}
 
-	if (dataLength == 1) {
+	if dataLength == 1 {
 		if v, ok := data[0].(string); ok {
 			url = v
 		} else {
@@ -57,10 +64,10 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 		Data    interface{}
 		Status  int
 	}{
-		Url:url,
-		Data:mData,
-		Message:message,
-		Status:1,
+		Url:     url,
+		Data:    mData,
+		Message: message,
+		Status:  1,
 	}
 
 	this.Data["json"] = result
@@ -71,7 +78,6 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 
 }
 
-
 // 成功返回, 用法
 // Error("错误信息")
 // Error("错误信息","跳转链接")
@@ -80,14 +86,14 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 func (this *RestBaseController) Error(message string, data ...interface{}) {
 
 	var (
-		url string
-		mData interface{}
+		url        string
+		mData      interface{}
 		dataLength int
 	)
 
 	dataLength = len(data)
 
-	if (dataLength > 1) {
+	if dataLength > 1 {
 
 		mData = data[0]
 
@@ -96,7 +102,7 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 		}
 	}
 
-	if (dataLength == 1) {
+	if dataLength == 1 {
 		if v, ok := data[0].(string); ok {
 			url = v
 		} else {
@@ -111,10 +117,10 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 		Data    interface{}
 		Status  int
 	}{
-		Url:url,
-		Data:mData,
-		Message:message,
-		Status:0,
+		Url:     url,
+		Data:    mData,
+		Message: message,
+		Status:  0,
 	}
 
 	this.Data["json"] = result
@@ -126,7 +132,7 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 }
 
 func (this *RestBaseController) setDevHeader() {
-	if (beego.BConfig.RunMode == beego.DEV) {
+	if beego.BConfig.RunMode == beego.DEV {
 		//this.Ctx.Output.Header("P3P", "CP=CAO PSA OUR")
 		this.Ctx.Output.Header("Access-Control-Allow-Credentials", "true")
 		this.Ctx.Output.Header("Access-Control-Allow-Origin", "http://127.0.0.1:8010")
@@ -146,4 +152,26 @@ func (this *RestBaseController) UserId() int64 {
 	}
 
 	return userId
+}
+
+func (this *RestBaseController) CurrentUser() *models.User {
+
+	if this.currentUser == nil {
+		var user models.User
+		var userToken models.UserToken
+		token := this.Ctx.Input.Header("XX-Token")
+		if token != "" {
+			hasToken, _ := Orm.Where("token = ?", token).Get(&userToken)
+
+			if hasToken {
+				hasUser, _ := Orm.Where("id = ?", userToken.Id).Get(&user)
+				if hasUser {
+					this.currentUser = &user
+				}
+			}
+		}
+
+	}
+
+	return this.currentUser
 }

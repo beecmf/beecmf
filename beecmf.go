@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
+	xormCore "github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 )
 
@@ -37,8 +38,11 @@ func initDbXorm() {
 	fmt.Println(dbLink)
 	var err error
 	Orm, err = xorm.NewEngine("mysql", dbLink)
+	Orm.ShowSQL(true)
 	Orm.SetMaxOpenConns(maxOpenConn)
 	Orm.SetMaxIdleConns(maxIdleConn)
+	tbMapper := xormCore.NewPrefixMapper(xormCore.SnakeMapper{}, "cmf_")
+	Orm.SetTableMapper(tbMapper)
 
 	fmt.Println(err)
 }
