@@ -59,15 +59,15 @@ func (this *RestBaseController) Success(message string, data ...interface{}) {
 	}
 
 	result := struct {
-		Message string
+		Msg string
 		Url     string
 		Data    interface{}
-		Status  int
+		Code  int
 	}{
 		Url:     url,
 		Data:    mData,
-		Message: message,
-		Status:  1,
+		Msg: message,
+		Code:  1,
 	}
 
 	this.Data["json"] = result
@@ -112,15 +112,15 @@ func (this *RestBaseController) Error(message string, data ...interface{}) {
 	}
 
 	result := struct {
-		Message string
+		Msg string
 		Url     string
 		Data    interface{}
-		Status  int
+		Code  int
 	}{
 		Url:     url,
 		Data:    mData,
-		Message: message,
-		Status:  0,
+		Msg: message,
+		Code:  0,
 	}
 
 	this.Data["json"] = result

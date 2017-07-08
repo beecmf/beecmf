@@ -31,6 +31,8 @@ func initDbXorm() {
 	dbPort := beego.AppConfig.String("db.port")
 	dbName := beego.AppConfig.String("db.name")
 	dbCharset := beego.AppConfig.String("db.charset")
+	dbPrefix := beego.AppConfig.String("db.prefix")
+	dbDebug, _ := beego.AppConfig.Bool("db.debug")
 	maxIdleConn, _ := beego.AppConfig.Int("db.max_idle_conn")
 	maxOpenConn, _ := beego.AppConfig.Int("db.max_open_conn")
 
@@ -38,10 +40,10 @@ func initDbXorm() {
 	fmt.Println(dbLink)
 	var err error
 	Orm, err = xorm.NewEngine("mysql", dbLink)
-	Orm.ShowSQL(true)
+	Orm.ShowSQL(dbDebug)
 	Orm.SetMaxOpenConns(maxOpenConn)
 	Orm.SetMaxIdleConns(maxIdleConn)
-	tbMapper := xormCore.NewPrefixMapper(xormCore.SnakeMapper{}, "cmf_")
+	tbMapper := xormCore.NewPrefixMapper(xormCore.SnakeMapper{}, dbPrefix)
 	Orm.SetTableMapper(tbMapper)
 
 	fmt.Println(err)
